@@ -41,6 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
@@ -1574,6 +1575,41 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         return '#'
     }
 
+    private val pendingPackagesToProcess = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+    private var packageEventsJob: kotlinx.coroutines.Job? = null
+
+    private fun scheduleDebouncedPackageRefresh(packageName: String? = null) {
+        if (packageName != null) {
+            pendingPackagesToProcess.add(packageName)
+        }
+        packageEventsJob?.cancel()
+        packageEventsJob = viewModelScope.launch(Dispatchers.IO) {
+            delay(350L)
+            val packages = pendingPackagesToProcess.toList()
+            pendingPackagesToProcess.clear()
+
+            if (packages.isNotEmpty()) {
+                val pm = getApplication<Application>().packageManager
+                val prevUpdateTimes = actionsManager.loadAppUpdateTimes()
+                for (pkg in packages) {
+                    val pInfo = pm.getPackageInfoCompat(pkg)
+                    val launchIntent = pm.getLaunchIntentForPackage(pkg)
+                    val component = launchIntent?.component
+                    if (component != null && pInfo != null) {
+                        val compKey = "${component.packageName}/${component.className}"
+                        val prevTime = prevUpdateTimes[pkg]
+                        val lastUpdate = pInfo.lastUpdateTime
+                        if (prevTime == null || lastUpdate > prevTime) {
+                            actionsManager.onAppInstalledOrUpdated(compKey)
+                        }
+                    }
+                }
+            }
+            reloadInstalledIconPacks()
+            loadInstalledApps()
+        }
+    }
+
     fun onPackageRemoved(packageName: String, user: UserHandle = Process.myUserHandle()) {
         invalidateIconCache(packageName)
         if (user != Process.myUserHandle()) {
@@ -1581,33 +1617,16 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
             return
         }
         actionsManager.onPackageRemoved(packageName)
-        reloadInstalledIconPacks()
-        refreshApps(force = true)
+        scheduleDebouncedPackageRefresh()
     }
 
     fun onPackageAddedOrUpdated(packageName: String, user: UserHandle = Process.myUserHandle()) {
         invalidateIconCache(packageName)
-        reloadInstalledIconPacks()
         if (user != Process.myUserHandle()) {
             onProfileAvailabilityChanged(user, isAvailable = true)
             return
         }
-        viewModelScope.launch(Dispatchers.IO) {
-            val pm = getApplication<Application>().packageManager
-            val pInfo = pm.getPackageInfoCompat(packageName)
-            val launchIntent = pm.getLaunchIntentForPackage(packageName)
-            val component = launchIntent?.component
-            if (component != null && pInfo != null) {
-                val compKey = "${component.packageName}/${component.className}"
-                val prevUpdateTimes = actionsManager.loadAppUpdateTimes()
-                val prevTime = prevUpdateTimes[packageName]
-                val lastUpdate = pInfo.lastUpdateTime
-                if (prevTime == null || lastUpdate > prevTime) {
-                    actionsManager.onAppInstalledOrUpdated(compKey)
-                }
-            }
-            refreshApps(force = true)
-        }
+        scheduleDebouncedPackageRefresh(packageName)
     }
 
     fun invalidateAllIconCaches() {

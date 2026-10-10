@@ -402,6 +402,10 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         list.filter { it.profileType == ProfileType.WORK }
     }.flowOn(Dispatchers.Default).stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+    val personalApps: Flow<List<AppInfo>> = apps.map { list ->
+        list.filter { it.profileType == ProfileType.PERSONAL }
+    }.distinctUntilChanged().flowOn(Dispatchers.Default)
+
     private val alphabetBuckets: StateFlow<Map<Char, List<AppInfo>>> = apps.map { all ->
         all.groupBy { it.searchChar }
     }.flowOn(Dispatchers.Default).stateIn(viewModelScope, SharingStarted.Lazily, emptyMap())
@@ -438,7 +442,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
 
     val recentlyUpdatedApps: StateFlow<Set<String>> = actionsManager.recentlyUpdated
 
-    val todayActivity: StateFlow<Pair<List<AppInfo>, List<AppInfo>>> = combine(apps, actionsManager.recentlyUpdated) { allApps, recentlyUpdatedKeys ->
+    val todayActivity: StateFlow<Pair<List<AppInfo>, List<AppInfo>>> = combine(personalApps, actionsManager.recentlyUpdated) { personalList, recentlyUpdatedKeys ->
         withContext(Dispatchers.IO) {
             val recentThreshold = System.currentTimeMillis() - 24 * 60 * 60 * 1000L
             val pm = safeContext.packageManager
@@ -449,8 +453,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
             val packageInfoMap = installedPackages.associateBy { it.packageName }
             val updateTimeMap = mutableMapOf<String, Long>()
 
-            for (app in allApps) {
-                if (app.profileType != ProfileType.PERSONAL) continue
+            for (app in personalList) {
                 try {
                     val pInfo = packageInfoMap[app.packageName] ?: pm.getPackageInfoCompat(app.packageName) ?: continue
                     val firstInstall = pInfo.firstInstallTime

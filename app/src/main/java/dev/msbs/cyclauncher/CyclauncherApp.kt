@@ -8,6 +8,10 @@ import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import dev.msbs.cyclauncher.coil.AppIconFetcher
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 /**
  * Application class initializing Coil image loader with memory caching for app icons.
  */
@@ -17,9 +21,14 @@ class CyclauncherApp : Application(), SingletonImageLoader.Factory {
 
     override fun onCreate() {
         super.onCreate()
-        try {
-            cacheDir.resolve("image_cache").deleteRecursively()
-        } catch (_: Exception) {}
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val legacyCache = cacheDir.resolve("image_cache")
+                if (legacyCache.exists()) {
+                    legacyCache.deleteRecursively()
+                }
+            } catch (_: Exception) {}
+        }
     }
 
     override fun newImageLoader(context: Context): ImageLoader {

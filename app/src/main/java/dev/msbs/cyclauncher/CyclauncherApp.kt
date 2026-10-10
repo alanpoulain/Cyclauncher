@@ -58,7 +58,7 @@ class CyclauncherApp : Application(), SingletonImageLoader.Factory {
         try {
             val cache = memoryCache ?: return
             when {
-                level >= TRIM_MEMORY_COMPLETE -> cache.clear()
+                level >= TRIM_MEMORY_COMPLETE -> cache.trimToSize(TRIM_CRITICAL_MEMORY_BYTES)
                 level >= TRIM_MEMORY_MODERATE || level == TRIM_MEMORY_RUNNING_CRITICAL -> cache.trimToSize(cache.size / 2)
             }
         } catch (_: Exception) {}
@@ -80,5 +80,6 @@ class CyclauncherApp : Application(), SingletonImageLoader.Factory {
 
     private companion object {
         const val MAX_MEMORY_BYTES = 24L * 1024L * 1024L
+        const val TRIM_CRITICAL_MEMORY_BYTES = 4L * 1024L * 1024L
     }
 }

@@ -765,7 +765,9 @@ class MainActivity : ComponentActivity() {
             }
         }
         if (viewModel.apps.value.isEmpty()) {
-            viewModel.refreshApps()
+            if (!viewModel.isAppsLoading) {
+                viewModel.refreshApps()
+            }
         } else {
             viewModel.checkProfileStateAsync()
             viewModel.prewarmActiveIcons()

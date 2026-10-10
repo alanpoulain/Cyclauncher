@@ -1179,7 +1179,13 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     fun deleteTag(tagId: String) = actionsManager.deleteTag(tagId)
     fun toggleTagForApp(componentKey: String, tagId: String) = actionsManager.toggleTagForApp(componentKey, tagId)
 
-    fun refreshApps() {
+    val isAppsLoading: Boolean
+        get() = loadAppsJob?.isActive == true
+
+    fun refreshApps(force: Boolean = false) {
+        if (!force && loadAppsJob?.isActive == true) {
+            return
+        }
         loadInstalledApps()
     }
 
@@ -1573,7 +1579,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         }
         actionsManager.onPackageRemoved(packageName)
         reloadInstalledIconPacks()
-        refreshApps()
+        refreshApps(force = true)
     }
 
     fun onPackageAddedOrUpdated(packageName: String, user: UserHandle = Process.myUserHandle()) {
@@ -1597,7 +1603,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
                     actionsManager.onAppInstalledOrUpdated(compKey)
                 }
             }
-            refreshApps()
+            refreshApps(force = true)
         }
     }
 

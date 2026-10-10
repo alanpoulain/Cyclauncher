@@ -216,6 +216,9 @@ data class AccentColor(
          */
         fun isWallpaperDark(context: Context, cachedColors: WallpaperColors? = null): Boolean {
             try {
+                if (cachedColors == null) {
+                    lastResolvedTheme?.let { return it.isDark }
+                }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                     val colors = cachedColors ?: run {
                         val wpManager = context.getSystemService(Context.WALLPAPER_SERVICE) as? WallpaperManager

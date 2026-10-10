@@ -22,6 +22,7 @@ import android.app.WallpaperColors
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.content.pm.LauncherApps
@@ -176,7 +177,9 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     private val _showKeepAndroidOpenDays = MutableStateFlow(true)
     val showKeepAndroidOpenDays: StateFlow<Boolean> = _showKeepAndroidOpenDays
 
-    private val _isWallpaperDark = MutableStateFlow(AccentColor.isWallpaperDark(safeContext))
+    private val _isWallpaperDark = MutableStateFlow(
+        (safeContext.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+    )
     val isWallpaperDark: StateFlow<Boolean> = _isWallpaperDark
 
     private val _searchMethod = MutableStateFlow(SearchMethod.SIDE_ALPHABET)
@@ -807,7 +810,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         _handSide.value = try { HandSide.valueOf(savedHand) } catch (e: Exception) { HandSide.LEFT }
         
         val savedColor = prefs.getString("accent_color", AccentColor.SKY.name) ?: AccentColor.SKY.name
-        _accentColor.value = AccentColor.fromName(savedColor, safeContext)
+        _accentColor.value = AccentColor.fromName(savedColor, null)
         
         val savedTextColor = prefs.getString("primary_text_color", PrimaryTextColor.WHITE.name) ?: PrimaryTextColor.WHITE.name
         _primaryTextColor.value = PrimaryTextColor.fromName(savedTextColor)

@@ -2066,7 +2066,7 @@ private fun AccentColorDropdown(
     selectedColor: AccentColor,
     primaryTextColor: PrimaryTextColor = PrimaryTextColor.WHITE,
     popupTheme: PopupTheme = PopupTheme.DARK,
-    isWallpaperDark: Boolean = AccentColor.isWallpaperDark(LocalContext.current),
+    isWallpaperDark: Boolean = false,
     onSelect: (AccentColor) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
@@ -2134,7 +2134,7 @@ private fun AccentColorDropdown(
 private fun AccentColorDialog(
     selectedColor: AccentColor,
     popupTheme: PopupTheme,
-    isWallpaperDark: Boolean = AccentColor.isWallpaperDark(LocalContext.current),
+    isWallpaperDark: Boolean = false,
     onDismiss: () -> Unit,
     onSelect: (AccentColor) -> Unit
 ) {

@@ -121,6 +121,7 @@ fun MainMenuScreen(
     val recentlyUpdatedApps by viewModel.recentlyUpdatedApps.collectAsState()
     val monochromeHistory by viewModel.monochromeHistory.collectAsState()
     val monochromeTags by viewModel.monochromeTags.collectAsState()
+    val showTagsArea by viewModel.showTagsArea.collectAsState()
     val historyColorFilter = remember(monochromeHistory, primaryTextColor) {
         if (monochromeHistory) {
             androidx.compose.ui.graphics.ColorFilter.colorMatrix(
@@ -455,6 +456,7 @@ fun MainMenuScreen(
 
             val renderHistory: @Composable (Modifier) -> Unit = { modifier ->
                 HistorySection(
+                    showTagsArea = showTagsArea,
                     viewModel = viewModel,
                     modifier = modifier,
                     history = history,
@@ -691,6 +693,7 @@ private fun HistorySection(
     popularTags: List<Pair<Tag, List<AppInfo>>>,
     recentlyUpdatedApps: Set<String>,
     monochromeTags: Boolean = false,
+    showTagsArea: Boolean = true,
     handSide: HandSide,
     primaryTextColor: PrimaryTextColor,
     showShadows: Boolean,
@@ -727,7 +730,7 @@ private fun HistorySection(
             if (history.isNotEmpty() && (listState.firstVisibleItemIndex != 0 || listState.firstVisibleItemScrollOffset != 0)) {
                 listState.scrollToItem(0)
             }
-            if (popularTags.isNotEmpty() && (tagGridState.firstVisibleItemIndex != 0 || tagGridState.firstVisibleItemScrollOffset != 0)) {
+            if (showTagsArea && popularTags.isNotEmpty() && (tagGridState.firstVisibleItemIndex != 0 || tagGridState.firstVisibleItemScrollOffset != 0)) {
                 tagGridState.scrollToItem(0)
             }
         }
@@ -744,7 +747,32 @@ private fun HistorySection(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = if (handSide == HandSide.RIGHT) Alignment.End else Alignment.Start
     ) {
-        if (isHistoryShiftedUp) {
+        if (!showTagsArea) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = if (handSide == HandSide.RIGHT) Alignment.End else Alignment.Start
+            ) {
+                HistoryContentBlock(
+                    listState = listState,
+                    history = history,
+                    recentlyUpdatedApps = recentlyUpdatedApps,
+                    handSide = handSide,
+                    primaryTextColor = primaryTextColor,
+                    showShadows = showShadows,
+                    accentColor = accentColor,
+                    colorFilter = colorFilter,
+                    isHistoryPaused = isHistoryPaused,
+                    isHistoryEditMode = isHistoryEditMode,
+                    setHistoryEditMode = setHistoryEditMode,
+                    onRemoveFromHistory = onRemoveFromHistory,
+                    onHistoryIconClick = onHistoryIconClick,
+                    onSettingsClick = currentOnSettingsClick,
+                    onAppClick = onAppClick,
+                    onAppLongClick = onAppLongClick
+                )
+            }
+        } else if (isHistoryShiftedUp) {
             Column(
                 modifier = Modifier
                     .fillMaxHeight(0.5f)

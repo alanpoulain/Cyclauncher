@@ -175,6 +175,9 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     private val _monochromeTags = MutableStateFlow(false)
     val monochromeTags: StateFlow<Boolean> = _monochromeTags
 
+    private val _showTagsArea = MutableStateFlow(true)
+    val showTagsArea: StateFlow<Boolean> = _showTagsArea
+
     private val _showKeepAndroidOpenDays = MutableStateFlow(true)
     val showKeepAndroidOpenDays: StateFlow<Boolean> = _showKeepAndroidOpenDays
 
@@ -848,6 +851,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         _hapticFeedbackEnabled.value = prefs.getBoolean("haptic_feedback_enabled", true)
         _monochromeHistory.value = prefs.getBoolean("monochrome_history", false)
         _monochromeTags.value = prefs.getBoolean("monochrome_tags", false)
+        _showTagsArea.value = prefs.getBoolean("show_tags_area", true)
         _showKeepAndroidOpenDays.value = prefs.getBoolean("show_keep_android_open_days", true)
 
         val savedSearchMethod = prefs.getString("search_method", SearchMethod.SIDE_ALPHABET.name) ?: SearchMethod.SIDE_ALPHABET.name
@@ -1005,6 +1009,12 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     fun setMonochromeHistory(enabled: Boolean) {
         _monochromeHistory.value = enabled
         editPrefs { putBoolean("monochrome_history", enabled) }
+    }
+
+    /** Shows or hides the popular tags area on the main screen. */
+    fun setShowTagsArea(enabled: Boolean) {
+        _showTagsArea.value = enabled
+        editPrefs { putBoolean("show_tags_area", enabled) }
     }
 
     fun setMonochromeTags(enabled: Boolean) {

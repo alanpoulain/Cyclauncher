@@ -141,6 +141,7 @@
     <string name="settings_monochrome_options">Select Monochrome Options</string>
     <string name="settings_monochrome_history">History</string>
     <string name="settings_monochrome_tags">Tags</string>
+    <string name="settings_show_tags_area">Show tags area</string>
 
     <string name="settings_language">Language</string>
     <string name="settings_select_language">Select language</string>

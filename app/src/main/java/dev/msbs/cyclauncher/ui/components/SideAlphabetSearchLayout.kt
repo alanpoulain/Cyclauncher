@@ -261,7 +261,7 @@ fun SideAlphabetSearchLayout(
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(start = 4.dp, end = 4.dp, bottom = 4.dp)
+                                    .padding(start = 2.dp, end = 2.dp, bottom = 2.dp)
                             )
 
                             SideAlphabetGrid(
@@ -400,7 +400,7 @@ fun SideAlphabetSearchLayout(
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(start = 4.dp, end = 4.dp, bottom = 4.dp)
+                                    .padding(start = 2.dp, end = 2.dp, bottom = 2.dp)
                             )
 
                             SideAlphabetGrid(
@@ -642,12 +642,12 @@ private fun SideAlphabetGrid(
 
     fun getCharFromOffset(offset: Offset): Char? {
         if (gridBoundsSize.width > 0f) {
-            val cellW = gridBoundsSize.width / cols
-            val spacingPx = with(density) { 4.dp.toPx() }
-            val stepY = cellW + spacingPx
-            if (cellW > 0f && stepY > 0f) {
-                val c = (offset.x / cellW).toInt().coerceIn(0, cols - 1)
-                val r = (offset.y / stepY).toInt().coerceIn(0, rows - 1)
+            val spacingPx = with(density) { 2.dp.toPx() }
+            val tileW = (gridBoundsSize.width - (cols - 1) * spacingPx) / cols
+            val step = tileW + spacingPx
+            if (step > 0f) {
+                val c = (offset.x / step).toInt().coerceIn(0, cols - 1)
+                val r = (offset.y / step).toInt().coerceIn(0, rows - 1)
                 val index = r * cols + c
                 if (index in alphabet.indices) {
                     return alphabet[index]
@@ -661,7 +661,7 @@ private fun SideAlphabetGrid(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = maxGridHeight)
-            .padding(bottom = 8.dp, start = 4.dp, end = 4.dp)
+            .padding(bottom = 6.dp, start = 2.dp, end = 2.dp)
             .onGloballyPositioned { gridBoundsSize = it.size.toSize() }
             .pointerInput(alphabet) {
                 awaitEachGesture {
@@ -690,12 +690,12 @@ private fun SideAlphabetGrid(
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             for (r in 0 until rows) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     for (c in 0 until cols) {
                         val index = r * cols + c
@@ -748,8 +748,8 @@ private fun LetterTile(
         Text(
             text = char.toString(),
             color = textColor,
-            fontSize = 16.sp,
-            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
+            fontSize = 20.sp,
+            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.SemiBold,
             style = MaterialTheme.typography.bodyMedium.copy(shadow = shadow)
         )
     }

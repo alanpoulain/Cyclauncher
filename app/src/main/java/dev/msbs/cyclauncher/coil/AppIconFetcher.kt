@@ -21,13 +21,31 @@ import kotlinx.coroutines.withContext
 
 import dev.msbs.cyclauncher.icons.IconPackManager
 
-/** Key representing an application icon in "packageName/activityName" format. */
-data class AppIconKey(val componentKey: String)
+/** Manager tracking per-package version epochs for immediate Coil memory cache invalidation. */
+object IconEpochManager {
+    private val packageEpochs = java.util.concurrent.ConcurrentHashMap<String, Long>()
+
+    fun getEpoch(packageName: String): Long = packageEpochs[packageName] ?: 0L
+
+    fun incrementEpoch(packageName: String): Long {
+        return packageEpochs.compute(packageName) { _, current -> (current ?: 0L) + 1L } ?: 1L
+    }
+
+    fun clear() {
+        packageEpochs.clear()
+    }
+}
+
+/** Key representing an application icon in "packageName/activityName" format with version epoch. */
+data class AppIconKey(
+    val componentKey: String,
+    val epoch: Long = IconEpochManager.getEpoch(componentKey.substringBefore('/').substringBefore('#'))
+)
 
 /** Coil 3 Keyer for computing stable memory cache keys for [AppIconKey]. */
 class AppIconKeyer : Keyer<AppIconKey> {
     override fun key(data: AppIconKey, options: Options): String {
-        return data.componentKey
+        return "appicon:${data.componentKey}:e=${data.epoch}"
     }
 }
 

@@ -1630,6 +1630,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun invalidateAllIconCaches() {
+        dev.msbs.cyclauncher.coil.IconEpochManager.clear()
         dev.msbs.cyclauncher.icons.IconShapeHelper.invalidateCache()
         try {
             val imageLoader = coil3.SingletonImageLoader.get(getApplication())
@@ -1641,6 +1642,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     }
 
     private fun invalidateIconCache(packageName: String) {
+        dev.msbs.cyclauncher.coil.IconEpochManager.incrementEpoch(packageName)
         try {
             val imageLoader = coil3.SingletonImageLoader.get(getApplication())
             imageLoader.memoryCache?.let { memoryCache ->

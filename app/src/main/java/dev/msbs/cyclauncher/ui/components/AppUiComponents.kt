@@ -342,11 +342,13 @@ fun rememberAppIconPainter(iconKey: String, sizeDp: Int = 48): Painter {
     val context = LocalContext.current
     val density = androidx.compose.ui.platform.LocalDensity.current
     val iconPackVersion = LocalIconPackVersion.current
+    val pkgName = iconKey.substringBefore('/').substringBefore('#')
+    val epoch = dev.msbs.cyclauncher.coil.IconEpochManager.getEpoch(pkgName)
     return rememberAsyncImagePainter(
-        model = remember(iconKey, sizeDp, density, iconPackVersion) {
+        model = remember(iconKey, sizeDp, density, iconPackVersion, epoch) {
             val px = with(density) { sizeDp.dp.roundToPx() }.coerceAtLeast(1)
             ImageRequest.Builder(context)
-                .data(dev.msbs.cyclauncher.coil.AppIconKey(iconKey))
+                .data(dev.msbs.cyclauncher.coil.AppIconKey(iconKey, epoch))
                 .size(px)
                 .diskCachePolicy(CachePolicy.DISABLED)
                 .memoryCachePolicy(CachePolicy.ENABLED)

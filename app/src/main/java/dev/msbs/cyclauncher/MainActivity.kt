@@ -84,6 +84,7 @@ class MainActivity : ComponentActivity() {
     private var appWidgetHost: AppWidgetHost? = null
     private var appWidgetManager: AppWidgetManager? = null
     private var unlockReceiver: BroadcastReceiver? = null
+    private var hideStatusBarRetryRunnable: Runnable? = null
 
     companion object {
         private const val REQUEST_CONFIGURE_WIDGET = 1025
@@ -657,6 +658,10 @@ class MainActivity : ComponentActivity() {
     override fun onPause() {
         super.onPause()
         clearPendingProfileLaunch()
+        hideStatusBarRetryRunnable?.let {
+            window.decorView.removeCallbacks(it)
+            hideStatusBarRetryRunnable = null
+        }
     }
 
     override fun onStop() {
@@ -756,7 +761,9 @@ class MainActivity : ComponentActivity() {
             }
         }
         viewModel.refreshDynamicWallpaperColor(this)
-        updateStatusBarVisibility(viewModel.hideStatusBar.value)
+        val shouldHideStatusBar = viewModel.hideStatusBar.value
+        updateStatusBarVisibility(shouldHideStatusBar)
+        scheduleDelayedStatusBarUpdate(shouldHideStatusBar)
         viewModel.updateDefaultLauncherStatus { isDefault ->
             val changed = isDefaultLauncherCached != isDefault
             isDefaultLauncherCached = isDefault
@@ -777,7 +784,9 @@ class MainActivity : ComponentActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
-            updateStatusBarVisibility(viewModel.hideStatusBar.value)
+            val shouldHideStatusBar = viewModel.hideStatusBar.value
+            updateStatusBarVisibility(shouldHideStatusBar)
+            scheduleDelayedStatusBarUpdate(shouldHideStatusBar)
         }
     }
 
@@ -790,6 +799,10 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         clearPendingProfileLaunch()
+        hideStatusBarRetryRunnable?.let {
+            window.decorView.removeCallbacks(it)
+            hideStatusBarRetryRunnable = null
+        }
         unlockReceiver?.let {
             try { unregisterReceiver(it) } catch (_: Exception) {}
             unlockReceiver = null
@@ -1019,6 +1032,18 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun scheduleDelayedStatusBarUpdate(hide: Boolean) {
+        if (!hide) return
+        hideStatusBarRetryRunnable?.let { window.decorView.removeCallbacks(it) }
+        val runnable = Runnable {
+            if (!isFinishing && !isDestroyed) {
+                updateStatusBarVisibility(true)
+            }
+        }
+        hideStatusBarRetryRunnable = runnable
+        window.decorView.postDelayed(runnable, 350L)
     }
 }
 

@@ -114,6 +114,7 @@ fun SettingsScreen(
     val monochromeHistory by viewModel.monochromeHistory.collectAsState()
     val monochromeTags by viewModel.monochromeTags.collectAsState()
     val showTagsArea by viewModel.showTagsArea.collectAsState()
+    val showHistoryArea by viewModel.showHistoryArea.collectAsState()
     val showKeepAndroidOpenDays by viewModel.showKeepAndroidOpenDays.collectAsState()
     val isWpDark by viewModel.isWallpaperDark.collectAsState()
     val customCharMappings by viewModel.customCharMappings.collectAsState()
@@ -235,6 +236,7 @@ fun SettingsScreen(
                             monochromeHistory = monochromeHistory,
                             monochromeTags = monochromeTags,
                             showTagsArea = showTagsArea,
+                            showHistoryArea = showHistoryArea,
                             accentColor = accentColor,
                             primaryTextColor = primaryTextColor,
                             popupTheme = popupTheme,
@@ -247,7 +249,8 @@ fun SettingsScreen(
                             onHapticFeedbackChange = { viewModel.setHapticFeedbackEnabled(it) },
                             onMonochromeHistoryChange = { viewModel.setMonochromeHistory(it) },
                             onMonochromeTagsChange = { viewModel.setMonochromeTags(it) },
-                            onShowTagsAreaChange = { viewModel.setShowTagsArea(it) }
+                            onShowTagsAreaChange = { viewModel.setShowTagsArea(it) },
+                            onShowHistoryAreaChange = { viewModel.setShowHistoryArea(it) }
                         )
 
                         SettingsDivider(primaryTextColor, top = 5.dp, bottom = 8.dp)
@@ -829,6 +832,7 @@ private fun StatusBarAndAnimationsSection(
     monochromeHistory: Boolean,
     monochromeTags: Boolean,
     showTagsArea: Boolean,
+    showHistoryArea: Boolean,
     accentColor: AccentColor,
     primaryTextColor: PrimaryTextColor,
     popupTheme: PopupTheme,
@@ -841,7 +845,8 @@ private fun StatusBarAndAnimationsSection(
     onHapticFeedbackChange: (Boolean) -> Unit,
     onMonochromeHistoryChange: (Boolean) -> Unit,
     onMonochromeTagsChange: (Boolean) -> Unit,
-    onShowTagsAreaChange: (Boolean) -> Unit
+    onShowTagsAreaChange: (Boolean) -> Unit,
+    onShowHistoryAreaChange: (Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -1073,27 +1078,58 @@ private fun StatusBarAndAnimationsSection(
 
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            TouchMarqueeText(
-                text = stringResource(R.string.settings_show_tags_area),
-                color = primaryTextColor.color,
-                style = TextStyle(shadow = shadow, fontSize = 13.5.sp),
-                modifier = Modifier.weight(1f, fill = false)
-            )
-            Switch(
-                checked = showTagsArea,
-                onCheckedChange = onShowTagsAreaChange,
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = accentColor.color,
-                    checkedTrackColor = accentColor.color.copy(alpha = 0.45f),
-                    checkedBorderColor = accentColor.color.copy(alpha = 0.80f),
-                    uncheckedThumbColor = accentColor.color.copy(alpha = 0.65f),
-                    uncheckedTrackColor = accentColor.color.copy(alpha = 0.12f),
-                    uncheckedBorderColor = accentColor.color.copy(alpha = 0.35f)
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TouchMarqueeText(
+                    text = stringResource(R.string.settings_show_tags_area),
+                    color = primaryTextColor.color,
+                    style = TextStyle(shadow = shadow, fontSize = 13.5.sp),
+                    modifier = Modifier.weight(1f, fill = false)
                 )
-            )
+                Switch(
+                    checked = showTagsArea,
+                    onCheckedChange = onShowTagsAreaChange,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = accentColor.color,
+                        checkedTrackColor = accentColor.color.copy(alpha = 0.45f),
+                        checkedBorderColor = accentColor.color.copy(alpha = 0.80f),
+                        uncheckedThumbColor = accentColor.color.copy(alpha = 0.65f),
+                        uncheckedTrackColor = accentColor.color.copy(alpha = 0.12f),
+                        uncheckedBorderColor = accentColor.color.copy(alpha = 0.35f)
+                    )
+                )
+            }
+
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TouchMarqueeText(
+                    text = stringResource(R.string.settings_show_history_area),
+                    color = primaryTextColor.color,
+                    style = TextStyle(shadow = shadow, fontSize = 13.5.sp),
+                    modifier = Modifier.weight(1f, fill = false)
+                )
+                Switch(
+                    checked = showHistoryArea,
+                    onCheckedChange = onShowHistoryAreaChange,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = accentColor.color,
+                        checkedTrackColor = accentColor.color.copy(alpha = 0.45f),
+                        checkedBorderColor = accentColor.color.copy(alpha = 0.80f),
+                        uncheckedThumbColor = accentColor.color.copy(alpha = 0.65f),
+                        uncheckedTrackColor = accentColor.color.copy(alpha = 0.12f),
+                        uncheckedBorderColor = accentColor.color.copy(alpha = 0.35f)
+                    )
+                )
+            }
         }
 
         Row(

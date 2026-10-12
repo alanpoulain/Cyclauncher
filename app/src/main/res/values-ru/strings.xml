@@ -139,7 +139,8 @@
     <string name="settings_monochrome_options">Выбрать параметры монохрома</string>
     <string name="settings_monochrome_history">История</string>
     <string name="settings_monochrome_tags">Теги</string>
-    <string name="settings_show_tags_area">Показывать область тегов</string>
+    <string name="settings_show_tags_area">Область тегов</string>
+    <string name="settings_show_history_area">Область истории</string>
 
     <string name="settings_language">Язык</string>
     <string name="settings_select_language">Выбрать язык</string>

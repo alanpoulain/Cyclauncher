@@ -178,6 +178,9 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     private val _showTagsArea = MutableStateFlow(true)
     val showTagsArea: StateFlow<Boolean> = _showTagsArea
 
+    private val _showHistoryArea = MutableStateFlow(true)
+    val showHistoryArea: StateFlow<Boolean> = _showHistoryArea
+
     private val _showKeepAndroidOpenDays = MutableStateFlow(true)
     val showKeepAndroidOpenDays: StateFlow<Boolean> = _showKeepAndroidOpenDays
 
@@ -852,6 +855,7 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
         _monochromeHistory.value = prefs.getBoolean("monochrome_history", false)
         _monochromeTags.value = prefs.getBoolean("monochrome_tags", false)
         _showTagsArea.value = prefs.getBoolean("show_tags_area", true)
+        _showHistoryArea.value = prefs.getBoolean("show_history_area", true)
         _showKeepAndroidOpenDays.value = prefs.getBoolean("show_keep_android_open_days", true)
 
         val savedSearchMethod = prefs.getString("search_method", SearchMethod.SIDE_ALPHABET.name) ?: SearchMethod.SIDE_ALPHABET.name
@@ -1015,6 +1019,12 @@ class LauncherViewModel(application: Application) : AndroidViewModel(application
     fun setShowTagsArea(enabled: Boolean) {
         _showTagsArea.value = enabled
         editPrefs { putBoolean("show_tags_area", enabled) }
+    }
+
+    /** Shows or hides the history area on the main screen. Recording is unaffected. */
+    fun setShowHistoryArea(enabled: Boolean) {
+        _showHistoryArea.value = enabled
+        editPrefs { putBoolean("show_history_area", enabled) }
     }
 
     fun setMonochromeTags(enabled: Boolean) {

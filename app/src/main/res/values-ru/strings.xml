@@ -141,6 +141,11 @@
     <string name="settings_monochrome_tags">Теги</string>
     <string name="settings_show_tags_area">Область тегов</string>
     <string name="settings_show_history_area">Область истории</string>
+    <string name="settings_main_screen">Главный экран</string>
+    <string name="settings_main_screen_options">Параметры главного экрана</string>
+    <string name="settings_main_screen_all_visible">Все области видны</string>
+    <string name="settings_hide_history_desc">История скрыта</string>
+    <string name="settings_hide_tags_desc">Теги скрыты</string>
 
     <string name="settings_language">Язык</string>
     <string name="settings_select_language">Выбрать язык</string>
